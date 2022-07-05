@@ -34,10 +34,7 @@ var
 
 begin
   GetIntVec($64, p);
-  if p <> nil then
-    ExitProcExists := true
-  else
-    ExitProcExists := false;
+  ExitProcExists := p <> nil;
 end;
 
 procedure ExitOldProgram;
