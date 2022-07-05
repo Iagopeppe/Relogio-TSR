@@ -107,25 +107,24 @@ begin
   Writeln(IsRunning);
   if IsRunning then
   begin
-    Writeln('O programa ja esta rodando. Gostaria de desligar?');
+    Writeln('O programa ja esta rodando. Digite Y para desligar e iniciar novamente, ou N para desligar');
     Readln(UserInput);
     Writeln(UserInput);
-    if (pos('y', UserInput) = 1) then
+    if (pos('Y', UserInput) = 1) then
     begin
       ChangeCfg(false);
-      Delay(5000);
+      Writeln('Pressione Enter quando o relogio parar.');
+      Readln;
       ChangeCfg(true);
       Ticks := 0;
       GetIntVec($1C, Anterior);
       SetIntVec($1C, Addr(Horas));
       Keep(0);
     end
-    else if (pos('n', UserInput) = 1) then
+    else if (pos('N', UserInput) = 1) then
     begin
-      Ticks := 0;
-      GetIntVec($1C, Anterior);
-      SetIntVec($1C, Addr(Horas));
-      Keep(0);
+      ChangeCfg(false);
+      Exit;
     end
     else
     begin
