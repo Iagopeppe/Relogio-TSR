@@ -9,17 +9,64 @@ var
   Ticks    : Byte;
   Anterior : Pointer;
   CPURegisters: Registers;
+  IsRunning : Boolean;
+  UserInput : String;
 
 procedure ExitProc;
 begin
   SetIntVec($1C, Anterior);
-
   CPURegisters.AH := $49;
   CPURegisters.ES := PrefixSeg;
   Intr($21, CPURegisters);
 end;
 
+procedure OpenCfg;
+var
+  f : text;
+  s : string;
 
+begin
+  Assign(f, 'relogcfg.txt');
+  Reset(f);
+  Readln(f,s);
+  Close(f);
+  if pos('false', s)=1 then
+    IsRunning := false
+  else
+    IsRunning := true;
+end;
+
+procedure ChangeCfg(newState:Boolean);
+var
+  f : text;
+
+begin
+  if newState then
+  begin
+    Assign(f, 'relogcfg.txt');
+    Rewrite(f);
+    Write(f,'true ');
+    Close(f)
+  end
+  else
+  begin
+    Assign(f, 'relogcfg.txt');
+    Rewrite(f);
+    Write(f,'false');
+    Close(f);
+  end
+end;
+
+procedure ShouldTerminate;
+begin
+  OpenCfg;
+  if not IsRunning then
+  begin
+    Writeln('Terminating...');
+    ChangeCfg(false);
+    ExitProc;
+  end
+end;
 
 procedure Horas; Interrupt;
 var
@@ -50,14 +97,48 @@ begin
       Write(S);
       GotoXY(Coluna, Linha);
       Ticks := 0;
-      ExitProc;
+      ShouldTerminate;
     end;
 end;
 
 
 begin
-  Ticks := 0;
-  GetIntVec($1C, Anterior);
-  SetIntVec($1C, Addr(Horas));
-  Keep(0);
+  OpenCfg;
+  Writeln(IsRunning);
+  if IsRunning then
+  begin
+    Writeln('O programa ja esta rodando. Gostaria de desligar?');
+    Readln(UserInput);
+    Writeln(UserInput);
+    if (pos('y', UserInput) = 1) then
+    begin
+      ChangeCfg(false);
+      Delay(5000);
+      ChangeCfg(true);
+      Ticks := 0;
+      GetIntVec($1C, Anterior);
+      SetIntVec($1C, Addr(Horas));
+      Keep(0);
+    end
+    else if (pos('n', UserInput) = 1) then
+    begin
+      Ticks := 0;
+      GetIntVec($1C, Anterior);
+      SetIntVec($1C, Addr(Horas));
+      Keep(0);
+    end
+    else
+    begin
+      Writeln('Comando nao aceito');
+      Exit;
+    end
+  end
+  else
+  begin
+    ChangeCfg(true);
+    Ticks := 0;
+    GetIntVec($1C, Anterior);
+    SetIntVec($1C, Addr(Horas));
+    Keep(0);
+  end
 end.
