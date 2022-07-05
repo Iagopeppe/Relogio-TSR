@@ -1,4 +1,4 @@
-{$M 10000, 0, 20}
+{$M 3000, 0, 20}
 program Relogio;
 
 uses
@@ -11,6 +11,7 @@ var
   Anterior2:    Pointer;
   CPURegisters: Registers;
   UserInput :   String;
+
 
 procedure ExitProc; Interrupt;
 begin
@@ -44,8 +45,6 @@ var
   R : Registers;
 
 begin
-  R.AH := $00;
-  R.AL := $1;
   Intr($64, R);
 end;
 
@@ -89,7 +88,6 @@ begin
   begin
     Writeln('O programa ja esta rodando. Digite Y para desligar e iniciar novamente, ou N para desligar');
     Readln(UserInput);
-    Writeln(UserInput);
     if (pos('Y', UserInput) = 1) then
     begin
       ExitOldProgram;
