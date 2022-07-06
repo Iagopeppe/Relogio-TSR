@@ -10,7 +10,7 @@ var
   Anterior :    Pointer;
   Anterior2:    Pointer;
   CPURegisters: Registers;
-  UserInput :   String;
+  UserInput :   Char;
 
 
 procedure ExitProc; Interrupt;
@@ -85,7 +85,8 @@ begin
   begin
     Writeln('O programa ja esta rodando. Digite Y para desligar e iniciar novamente, ou N para desligar');
     Readln(UserInput);
-    if (pos('Y', UserInput) = 1) then
+    UserInput := UpCase(UserInput);
+    if (pos('Y', UpCase(UserInput)) = 1) then
     begin
       ExitOldProgram;
       AllocateExitProc;
@@ -95,7 +96,7 @@ begin
       SetIntVec($1C, Addr(Horas));
       Keep(0);
     end
-    else if (pos('N', UserInput) = 1) then
+    else if (pos('N', UpCase(UserInput)) = 1) then
     begin
       ExitOldProgram;
       Exit;
